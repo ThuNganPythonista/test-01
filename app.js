@@ -3,9 +3,10 @@ const app = express();
 const PORT = 3000;
 
 // Dưx liệu giả lập để test api postman
+// Dummy data to store to-do items
 let todos = [
-  { id: 1, task: "Buy groceries" },
-  { id: 2, task: "Clean the house" },
+  { id: 1, task: "Buy groceries", createdAt: new Date().toISOString() },
+  { id: 2, task: "Clean the house", createdAt: new Date().toISOString() },
 ];
 
 // parse request body ra
