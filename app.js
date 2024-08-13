@@ -5,6 +5,8 @@ const AccountModel = require("./models/account.js");
 // const clientSide = require("client-side.js");
 var bodyParser = require("body-parser");
 var jwt = require("jsonwebtoken");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -13,6 +15,8 @@ var cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
 app.use(express.json());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Dưx liệu giả lập để test api postman
 let todos = [
