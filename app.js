@@ -23,7 +23,6 @@ let todos = [
 const checkLogin = async (req, res, next) => {
   const token = req.cookies.token;
 
-  // Check if the token exists
   if (!token) {
     return res.status(401).json("Token not provided");
   }
@@ -121,31 +120,30 @@ app.post("/register", (req, res, next) => {
     });
 });
 
-app.post("/login", (req, res, next) => {
-  var username = req.body.username;
-  var password = req.body.password;
+app.post("/login", async (req, res, next) => {
+  const username = req.body.username;
+  const password = req.body.password;
 
-  AccountModel.findOne({
-    username: username,
-    password: password,
-  })
-    .then((data) => {
-      if (data) {
-        var token = jwt.sign({ _id: data._id }, "mk");
-
-        // đăng nhập xong rồi thì lưu token trong cookie cho những lần tiếp theo
-        res.cookie("token", token, { httpOnly: true });
-
-        return res.json({
-          message: "dang nhap thanh cong ",
-        });
-      } else {
-        res.status(300).json("tai khoan khong đúng");
-      }
-    })
-    .catch((err) => {
-      res.status(500).json("Có lỗi bên server");
+  try {
+    const data = await AccountModel.findOne({
+      username: username,
+      password: password,
     });
+
+    if (data) {
+      const token = jwt.sign({ _id: data._id }, "mk");
+
+      res.cookie("token", token, { httpOnly: true });
+
+      return res.json({
+        message: "dang nhap thanh cong ",
+      });
+    } else {
+      res.status(300).json("tai khoan khong đúng");
+    }
+  } catch (err) {
+    res.status(500).json("Có lỗi bên server");
+  }
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
