@@ -20,8 +20,8 @@ let todos = [
   { id: 2, task: "Clean the house", createdAt: new Date().toISOString() },
 ];
 
-var checkLogin = (req, res, next) => {
-  var token = req.cookies.token;
+const checkLogin = async (req, res, next) => {
+  const token = req.cookies.token;
 
   // Check if the token exists
   if (!token) {
@@ -29,21 +29,14 @@ var checkLogin = (req, res, next) => {
   }
 
   try {
-    var idUser = jwt.verify(token, "mk");
-    AccountModel.findOne({
-      _id: idUser,
-    })
-      .then((data) => {
-        if (data) {
-          req.data = data;
-          next();
-        } else {
-          return res.status(401).json("Invalid token");
-        }
-      })
-      .catch((err) => {
-        return res.status(401).json("Invalid token");
-      });
+    const idUser = jwt.verify(token, "mk");
+    const data = await AccountModel.findOne({ _id: idUser });
+    if (data) {
+      req.data = data;
+      next();
+    } else {
+      return res.status(401).json("Invalid token");
+    }
   } catch (err) {
     return res.status(401).json("Invalid token");
   }
