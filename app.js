@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = 3000;
@@ -7,7 +8,6 @@ var bodyParser = require("body-parser");
 var jwt = require("jsonwebtoken");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var cookieParser = require("cookie-parser");
@@ -32,7 +32,7 @@ const checkLogin = async (req, res, next) => {
   }
 
   try {
-    const idUser = jwt.verify(token, "mk");
+    const idUser = jwt.verify(token, process.env.JWT_SECRET);
     const data = await AccountModel.findOne({ _id: idUser });
     if (data) {
       req.data = data;
@@ -135,7 +135,7 @@ app.post("/login", async (req, res, next) => {
     });
 
     if (data) {
-      const token = jwt.sign({ _id: data._id }, "mk");
+      const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET);
 
       res.cookie("token", token, { httpOnly: true });
 

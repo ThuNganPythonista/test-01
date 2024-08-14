@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-mongoose
-  .connect(
-    "mongodb+srv://Todo-app:dYWCPYvBPZchZFkt@todo-list.dgbed.mongodb.net/ThuNganPham?retryWrites=true&w=majority&appName=Todo-list"
-  )
-  .then(() => console.log("Connected!"));
+require("dotenv").config(); // Load .env file
+
+mongoose.connect(process.env.MONGO_URI).then(() => console.log("Connected!"));
+
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
@@ -16,5 +15,6 @@ const AccountSchema = new Schema(
     collection: "account",
   }
 );
+
 const AccountModel = mongoose.model("account", AccountSchema);
 module.exports = AccountModel;
