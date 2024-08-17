@@ -1,17 +1,57 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+require("./config/swagger.js");
+// const swaggerAutogen = require("swagger-autogen")();
+// const swaggerUi = require("swagger-ui-express");
+// const swaggerDocument = require("./swagger_output.json");
+// const swaggerUi = require("swagger-ui-express");
+// const swaggerDocument = require("./swagger_output.json");
+
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerAutogen = require("swagger-autogen")();
+
+const doc = {
+  info: {
+    version: "1.0.0",
+    title: "Todo API",
+    description:
+      "API for managing todo items, user registration, and authentication",
+  },
+  host: "localhost:3000",
+  basePath: "/",
+  schemes: ["http", "https"],
+  consumes: ["application/json"],
+  produces: ["application/json"],
+  securityDefinitions: {
+    cookieAuth: {
+      type: "apiKey",
+      in: "cookie",
+      name: "token",
+    },
+  },
+};
+
+const outputFile = "./swagger_output.json";
+const endpointsFiles = ["./routes/todos.js", "./routes/auth.js", "./app.js"];
+
+swaggerAutogen(outputFile, endpointsFiles, doc);
+
+// s;
 const PORT = 3000;
 var bodyParser = require("body-parser");
 var jwt = require("jsonwebtoken");
-const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("./config/swagger.json");
+// const swaggerUi = require("swagger-ui-express");
+// const swaggerDocument = require("./config/swagger.js");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Import routes
 const todosRoutes = require("./routes/todos.js");
 const authRoutes = require("./routes/auth.js");
@@ -25,9 +65,28 @@ const AccountModel = require("./models/account.js");
 app.use("/todos", authMiddleware.checkLogin, todosRoutes);
 app.use("/auth", authRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// const outputFile = "./swagger_output.json";
+// const endpointsFiles = ["./routes/index.js"];
+
+// const doc = {
+//   info: {
+//     version: "1.0.0",
+//     title: "My API",
+//     description: "API documentation",
+//   },
+//   host: "localhost:3000",
+//   basePath: "/",
+//   schemes: ["http", "https"],
+// };
+
+// swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+
+// });
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
 });
+
 module.exports = app;
 
 // require("dotenv").config();

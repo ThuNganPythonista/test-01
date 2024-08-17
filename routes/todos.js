@@ -3,10 +3,24 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 const { todos } = require("../utils/seed");
 
+/**
+ * @route GET /todos
+ * @summary Get all todos
+ * @security [{ cookieAuth: [] }]
+ * @returns {Array<Todo>} 200 - success response - application/json
+ */
+
 // GET /todos
 router.get("/", authMiddleware.checkLogin, (req, res) => {
   res.json(todos);
 });
+
+/**
+ * @route POST /todos
+ * @summary Create a new todo
+ * @body {TodoInput} 200 - Todo input
+ * @returns {Todo} 200 - Todo created
+ */
 
 // POST /todos
 router.post("/", (req, res) => {
