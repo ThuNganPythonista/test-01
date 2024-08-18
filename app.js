@@ -34,7 +34,6 @@ const doc = {
 
 const outputFile = "./swagger_output.json";
 const endpointsFiles = ["./app.js"];
-// "/routes/todos.js", "./routes/auth.js",
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
 

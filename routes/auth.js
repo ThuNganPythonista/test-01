@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const AccountModel = require("../models/account");
 
 /**
- * @route POST /register
+ * @route POST /auth/register
  * @summary Register a new user
  * @body {RegisterInput} 200 - Registration input
  * @returns 200 - Registration successful
