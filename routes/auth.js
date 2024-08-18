@@ -21,7 +21,7 @@ router.post("/register", (req, res, next) => {
   })
     .then((data) => {
       if (data) {
-        res.json("Tài khoản này đã tồn tại");
+        res.status(409).json("Tài khoản này đã tồn tại");
       } else {
         return AccountModel.create({
           username: username,
@@ -31,7 +31,7 @@ router.post("/register", (req, res, next) => {
     })
     .then((data) => {
       if (data) {
-        res.json("Tạo tài khoản thành công");
+        res.status(201).json("Tạo tài khoản thành công");
       }
     })
     .catch((err) => {
@@ -63,15 +63,15 @@ router.post("/login", async (req, res, next) => {
 
       res.cookie("token", token, { httpOnly: true });
 
-      return res.json({
+      return res.status(200).json({
         message: "dang nhap thanh cong ",
         token: token,
       });
     } else {
-      res.status(300).json("tai khoan khong đúng");
+      res.status(401).json({ message: "Thông tin đăng nhập không hợp lệ" });
     }
   } catch (err) {
-    res.status(500).json("Có lỗi bên server");
+    res.status(500).json({ message: "Lỗi server" });
   }
 });
 

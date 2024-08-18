@@ -130,11 +130,14 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Conflict"
           },
           "500": {
             "description": "Internal Server Error"
@@ -165,9 +168,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "300": {
-            "description": "Multiple Choices"
           },
           "401": {
             "description": "Unauthorized"
