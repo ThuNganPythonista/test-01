@@ -5,10 +5,10 @@ require("./config/swagger.js");
 // const swaggerAutogen = require("swagger-autogen")();
 // const swaggerUi = require("swagger-ui-express");
 // const swaggerDocument = require("./swagger_output.json");
-// const swaggerUi = require("swagger-ui-express");
-// const swaggerDocument = require("./swagger_output.json");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger_output.json");
 
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const swaggerAutogen = require("swagger-autogen")();
 
 const doc = {
@@ -33,7 +33,8 @@ const doc = {
 };
 
 const outputFile = "./swagger_output.json";
-const endpointsFiles = ["./routes/todos.js", "./routes/auth.js", "./app.js"];
+const endpointsFiles = ["./app.js"];
+// "/routes/todos.js", "./routes/auth.js",
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
 

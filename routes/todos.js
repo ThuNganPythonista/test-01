@@ -14,7 +14,6 @@ const { todos } = require("../utils/seed");
 router.get("/", authMiddleware.checkLogin, (req, res) => {
   res.json(todos);
 });
-
 /**
  * @route POST /todos
  * @summary Create a new todo
