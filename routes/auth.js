@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const AccountModel = require("../models/account");
+const authController = require("../controllers/auth");
 
 /**
  * @route POST /auth/register
@@ -11,33 +12,7 @@ const AccountModel = require("../models/account");
  * @returns 500 - Registration failed
  */
 
-router.post("/register", (req, res, next) => {
-  var username = req.body.username;
-  var password = req.body.password;
-
-  console.log(username, password);
-  AccountModel.findOne({
-    username: username,
-  })
-    .then((data) => {
-      if (data) {
-        res.status(409).json("Tài khoản này đã tồn tại");
-      } else {
-        return AccountModel.create({
-          username: username,
-          password: password,
-        });
-      }
-    })
-    .then((data) => {
-      if (data) {
-        res.status(201).json("Tạo tài khoản thành công");
-      }
-    })
-    .catch((err) => {
-      res.status(500).json("Tạo tài khoản thất bại");
-    });
-});
+router.post("/register", authController.register);
 
 /**
  * @route POST /auth/login
@@ -48,31 +23,6 @@ router.post("/register", (req, res, next) => {
  * @returns 500 - Server error
  */
 
-router.post("/login", async (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  try {
-    const data = await AccountModel.findOne({
-      username: username,
-      password: password,
-    });
-
-    if (data) {
-      const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET);
-
-      res.cookie("token", token, { httpOnly: true });
-
-      return res.status(200).json({
-        message: "dang nhap thanh cong ",
-        token: token,
-      });
-    } else {
-      res.status(401).json({ message: "Thông tin đăng nhập không hợp lệ" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi server" });
-  }
-});
+router.post("/login", authController.login);
 
 module.exports = router;
