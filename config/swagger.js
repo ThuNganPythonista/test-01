@@ -1,4 +1,5 @@
 const swaggerAutogen = require("swagger-autogen")();
+const fs = require("fs");
 
 const doc = {
   info: {
@@ -23,6 +24,22 @@ const doc = {
 
 const outputFile = "./swagger_output.json";
 const endpointsFiles = ["./routes/index.js"];
+
+// Kiểm tra xem file đã tồn tại hay chưa
+if (!fs.existsSync(outputFile)) {
+  // Nếu chưa tồn tại, tạo file với nội dung {}
+  fs.writeFileSync(outputFile, "{}");
+  console.log(`${outputFile} created with initial content.`);
+}
+
+// Tạo tài liệu Swagger
+swaggerAutogen(outputFile, endpointsFiles, doc)
+  .then(() => {
+    console.log(`Swagger documentation generated at ${outputFile}`);
+  })
+  .catch((err) => {
+    console.error("Error generating swagger documentation:", err);
+  });
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
 
