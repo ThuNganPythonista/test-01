@@ -9,7 +9,6 @@ const authMiddleware = require("./middleware/auth.js");
 const swaggerAutogen = require("swagger-autogen")();
 const cookieParser = require("cookie-parser");
 const router = require("./routes");
-const sessionRoutes = require("./routes/test-session.js");
 const { sessionConfig, session } = require("./config/session.config.js");
 
 const app = express();
@@ -24,7 +23,6 @@ app.use(session(sessionConfig));
 // API routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 router(app);
-app.use("/session", sessionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

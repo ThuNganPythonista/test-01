@@ -65,22 +65,21 @@ class AuthController {
     }
   }
 
-  // [POST] /auth/refresh-token
   async refreshToken(req, res, next) {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).json({ message: "No refresh token provided" });
+      return res.status(401).json({ message: "Không có refresh token" });
     }
 
     try {
       const user = await AccountModel.findOne({ refreshToken });
 
       if (!user) {
-        return res.status(403).json({ message: "Invalid refresh token" });
+        return res.status(403).json({ message: "Refresh token không hợp lệ" });
       }
 
-      // Generate a new access token
+      // Tạo access token mới
       const newAccessToken = jwt.sign(
         { _id: user._id },
         process.env.JWT_SECRET,

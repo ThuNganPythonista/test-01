@@ -25,4 +25,13 @@ router.post("/register", authController.register);
 
 router.post("/login", authController.login);
 
+/**
+ * @route POST /auth/refresh-token
+ * @summary Refresh access token
+ * @returns 200 - New access token
+ * @returns 401 - No refresh token provided
+ * @returns 403 - Invalid refresh token
+ */
+router.post("/refresh-token", authController.refreshToken);
+
 module.exports = router;
