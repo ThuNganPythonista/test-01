@@ -1,35 +1,37 @@
 const AccountModel = require("../models/account.js");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 class AuthController {
   // [POST] /auth/register
-  register(req, res, next) {
+  async register(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
 
-    console.log(username, password);
-    AccountModel.findOne({
-      username: username,
-    })
-      .then((data) => {
-        if (data) {
-          res.status(409).json("Tài khoản này đã tồn tại");
-        } else {
-          return AccountModel.create({
-            username: username,
-            password: password,
-          });
-        }
-      })
-      .then((data) => {
-        if (data) {
-          res.status(201).json("Tạo tài khoản thành công");
-        }
-      })
-      .catch((err) => {
-        res.status(500).json("Tạo tài khoản thất bại");
+    try {
+      console.log(username, password);
+      const existingUser = await AccountModel.findOne({ username });
+
+      if (existingUser) {
+        return res.status(409).json("Tài khoản này đã tồn tại");
+      }
+
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      // Create new user with hashed password
+      const newUser = await AccountModel.create({
+        username,
+        password: hashedPassword,
       });
+
+      return res.status(201).json("Tạo tài khoản thành công");
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json("Tạo tài khoản thất bại");
+    }
   }
 
   // [POST] /auth/login
@@ -38,33 +40,46 @@ class AuthController {
     const password = req.body.password;
 
     try {
-      const data = await AccountModel.findOne({ username, password });
+      const user = await AccountModel.findOne({ username });
 
-      if (data) {
-        const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET, {
-          expiresIn: "15m",
-        });
-        const refreshToken = crypto.randomBytes(64).toString("hex");
+      if (user) {
+        // Compare the provided password with the hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
 
-        await AccountModel.updateOne({ _id: data._id }, { refreshToken });
+        if (isMatch) {
+          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "15m",
+          });
+          const refreshToken = crypto.randomBytes(64).toString("hex");
 
-        res.cookie("token", token, { httpOnly: true });
-        res.cookie("refreshToken", refreshToken, { httpOnly: true });
-        req.session.userId = data._id;
+          await AccountModel.updateOne({ _id: user._id }, { refreshToken });
 
-        return res.status(200).json({
-          message: "Đăng nhập thành công",
-          token,
-          refreshToken,
-        });
+          res.cookie("token", token, { httpOnly: true });
+          res.cookie("refreshToken", refreshToken, { httpOnly: true });
+          req.session.userId = user._id;
+
+          return res.status(200).json({
+            message: "Đăng nhập thành công",
+            token,
+            refreshToken,
+          });
+        } else {
+          return res
+            .status(401)
+            .json({ message: "Thông tin đăng nhập không hợp lệ" });
+        }
       } else {
-        res.status(401).json({ message: "Thông tin đăng nhập không hợp lệ" });
+        return res
+          .status(401)
+          .json({ message: "Thông tin đăng nhập không hợp lệ" });
       }
     } catch (err) {
-      res.status(500).json({ message: "Lỗi server" });
+      console.error(err);
+      return res.status(500).json({ message: "Lỗi server" });
     }
   }
 
+  // [POST] /auth/refresh-token
   async refreshToken(req, res, next) {
     const refreshToken = req.cookies.refreshToken;
 
@@ -89,7 +104,8 @@ class AuthController {
       res.cookie("token", newAccessToken, { httpOnly: true });
       return res.status(200).json({ accessToken: newAccessToken });
     } catch (err) {
-      res.status(500).json({ message: "Lỗi server" });
+      console.error(err);
+      return res.status(500).json({ message: "Lỗi server" });
     }
   }
 }
